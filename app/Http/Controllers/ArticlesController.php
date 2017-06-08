@@ -13,8 +13,10 @@ class ArticlesController extends Controller
      */
     public function index()
     {
-	return __METHOD__. 'one';
-        //
+	//return __METHOD__. 'one';
+        $articles=\App\Article::latest()->paginate(3);
+	dd(view('articles',compact('articles'))->render());
+	return view('articles',compact('articles'));
     }
 
     /**
@@ -47,8 +49,11 @@ class ArticlesController extends Controller
      */
     public function show($id)
     {
-        //
+        $article= \App\Article::findOrFail($id);
+	dd($article);
+	return $article->toArray();
     }
+
 
     /**
      * Show the form for editing the specified resource.

@@ -9,6 +9,11 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+/* Hyunjoo.... */
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\AuthenticationException;
+use App\Exceptions\CustomException;
 /*Route::get('/{foo?}', function ($foo='bar') {
 	return $foo;    
 });*/
@@ -30,7 +35,7 @@ Route::get('/home',function(){
 	return view('welcome');
 });*/
 Route::get('/','WelcomeController@index');
-//Route::resource('articles','ArticlesController');
+Route::resource('articles','ArticlesController');
 Route::get('auth/login',function(){
 	$credentials =[
 		'email' => 'pizzu@gmail.com',
@@ -43,7 +48,7 @@ Route::get('auth/login',function(){
 	if(!Auth::attempt($credentials)){
 		return 'login fail';
 	} 
-	return redirect('protected');
+	return redirect('protected2');
 });
 
 Route::get('protected',function(){
@@ -67,6 +72,57 @@ Route::get('auth/logout',function(){
 	return 'see you again';
 });
 
-Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/page',function(){
+	$page=App\User::paginate(5);
+	return view('page',compact('page'));
+});
+Route::get('/error',function(){
+	return App\User::findOrFail(100);
+});
+Route::get('/custom',function(){
+ $message = [
+            'Success' => true,
+            'Message' =>'success message'
+        ];
+ 
+        // 강제 예외 발생
+        throw new CustomException('exception message');
+ 
+        return response()->json($message);
+});
+
+Route::get('/test',function(){
+ $message = [
+            'Success' => true,
+            'Message' =>'success message_test'
+        ];
+
+        // 강제 예외 발생
+        throw new AuthenticationException('exception Auth');
+
+        return response()->json($message);
+});
+Route::get('auth', function () {
+    $credentials = [
+        'email'    => 'pizzu@gmail.com',
+        'password' => 'vlguswn'
+    ];
+
+    if (! Auth::attempt($credentials)) {
+        return 'Incorrect username and password combination';
+    }
+
+    Event::fire('user.login', [Auth::user()]);       //Auth::user()->config/auth.php
+
+    var_dump('Event fired and continue to next line...');
+
+    return;
+});
+
+Event::listen('user.login', function($user) {
+	$user->last_login=(new DateTime)->format('Y-m-d H:i:s');
+	return $user->save();
+});

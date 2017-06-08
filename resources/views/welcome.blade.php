@@ -83,6 +83,7 @@
                 </div>
                 <div class="links">
 			<h1>{{$greeting or 'Hello'}}</h1>
+			<h5>{{ date('Y-m-d H:i:s') }}</h5>
                     <a href="https://laravel.com/docs">Documnet</a>
                     <a href="https://laracasts.com">Laracasts</a>
                     <a href="https://laravel-news.com">News</a>

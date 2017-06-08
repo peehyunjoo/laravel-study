@@ -3,7 +3,7 @@
 namespace App\Exceptions;
 
 use Exception;
-use Illuminate\Auth\AuthenticationException;
+#use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -32,7 +32,7 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
-        parent::report($exception);
+    	parent::report($exception);
     }
 
     /**
@@ -44,7 +44,35 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+	/*if(app()->environment('production')){
+		if($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException){
+			return response(view('errors.notice',[
+				'title'=>'NOT FOUND',
+				'description'=>'sorry'
+			]),404);
+		}
+	}
+        return parent::render($request, $exception);*/
+	if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+            return response(view('errors.notice', [
+                'title'       => 'Page Not Found',
+                'description' => 'Sorry, the page or resource you are trying to view does not exist.'
+            ]), 404);
+        }
+	if ($exception instanceof CustomException) {
+        	return response()->json([
+	            'Success' => false,
+        	    'Message' => $exception->getMessage()
+	        ], 500);	
+    	}
+	if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+		return response(view('errors.notice', [
+                'title'       => 'Page Not Authentication',
+                'description' => 'Sorry, Authentication'
+            ]), 404);
+        }
         return parent::render($request, $exception);
+	
     }
 
     /**
