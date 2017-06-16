@@ -15,7 +15,8 @@ class ArticlesController extends Controller
     {
 	//return __METHOD__. 'one';
         $articles=\App\Article::latest()->paginate(3);
-	dd(view('articles',compact('articles'))->render());
+	
+//	dd(view('articles',compact('articles'))->render());
 	return view('articles',compact('articles'));
     }
 
@@ -26,8 +27,8 @@ class ArticlesController extends Controller
      */
     public function create()
     {
-	return __METHOD__.'two';
-        //
+	//return __METHOD__.'two';
+        return view('create');
     }
 
     /**
@@ -36,10 +37,40 @@ class ArticlesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    /*public function store(Request $request)
     {
-        //
-    }
+	$rules =[
+                'title'=>['required'],
+                'content'=>['required','min:10'],
+        ];
+	$messages=[
+		'title.required' => 'title message',
+		'content.required'=>'content message',
+		'content.min'=>'content min',
+	];
+        $validator=\Validator::make($request->all(),$rules,$messages);
+
+        if($validator->fails()){
+                return back()->withErrors($validator)->withInput();
+        }
+
+        $article = \App\User::find(1)->articles()->create($request->all());
+        
+        if(! $article){
+                return back()->with('flash_message','글이 저장되지않았습니다')->withInput();
+        }
+
+        return redirect(route('index'))->with('flash_message','글이 저장되었습니다');
+    }*/
+
+	public function store(\App\Http\Requests\ArticlesRequest $request){
+		$article = \App\User::find(1)->articles()->create($request->all());
+
+	if(! $article){
+		return back()->with('flash_message','글이 저장되지않았습니다')->withInput();
+	}
+		return redirect(route('articles.index'))->with('flash_message','글이 저장되었습니다');
+	}
 
     /**
      * Display the specified resource.
@@ -49,9 +80,10 @@ class ArticlesController extends Controller
      */
     public function show($id)
     {
+	
         $article= \App\Article::findOrFail($id);
-	dd($article);
-	return $article->toArray();
+	debug($article->toArray());
+	return view('index',compact('article'));
     }
 
 

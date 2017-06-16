@@ -94,7 +94,7 @@ Route::get('/custom',function(){
         return response()->json($message);
 });
 
-Route::get('/test',function(){
+Route::get('/authException',function(){
  $message = [
             'Success' => true,
             'Message' =>'success message_test'
@@ -122,7 +122,51 @@ Route::get('auth', function () {
     return;
 });
 
+Auth::routes();
 Event::listen('user.login', function($user) {
 	$user->last_login=(new DateTime)->format('Y-m-d H:i:s');
 	return $user->save();
+});
+
+Route::post('posts', function(\Illuminate\Http\Request $request) {
+    $rule = [
+        'title' => ['required'], // == 'title' => 'required'
+        'body' => ['required', 'min:10'] // == 'body' => 'required|min:10'
+    ];
+
+    $validator = Validator::make($request->all(), $rule);
+
+    if ($validator->fails()) {
+        return redirect('posts/create')->withErrors($validator)->withInput();
+    }
+
+    return 'Valid & proceed to next job ~';
+});
+
+Route::get('posts/create', function() {
+    return view('post_create');
+});
+
+Route::get('/composer', function() {
+    $text =<<<EOT
+**Note** To make lists look nice, you can wrap items with hanging indents:
+
+    -   Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+        Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi,
+        viverra nec, fringilla in, laoreet vitae, risus.
+    -   Donec sit amet nisl. Aliquam semper ipsum sit amet velit.
+        Suspendisse id sem consectetuer libero luctus adipiscing.
+EOT;
+
+    return app(ParsedownExtra::class)->text($text);
+});
+Route::get('markdown',function(){
+	$text=<<<EOT
+#markdown example 1
+#HTML
+#first
+#second
+
+EOT;
+return app(ParsedownExtra::class)->text($text);
 });

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLastLoginToUsersTable extends Migration
+class CreateTagsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,12 @@ class AddLastLoginToUsersTable extends Migration
      */
     public function up()
     {
-        Schema::table('users',function(Blueprint $table){
-		$table->timestamp('last_login')->nullable();
-	});
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id');
+	    $table->string('name');
+	    $table->string('slug')->index();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -25,8 +28,6 @@ class AddLastLoginToUsersTable extends Migration
      */
     public function down()
     {
-        Schema::table('users',function(Blueprint $table){
-		$table->dropColumn('last_login');
-	});
+        Schema::dropIfExists('tags');
     }
 }
